@@ -11,6 +11,7 @@ class PluginSyncaadConnection extends CommonDBTM {
       return _n('Connexion Entra ID', 'Connexions Entra ID', $nb, 'syncaad');
    }
 
+
    function defineTabs($options = []) {
       $ong = [];
       $this->addStandardTab('PluginSyncaadConnection', $ong, $options);

@@ -15,12 +15,15 @@ class PluginSyncaadSync {
       }
    }
 
+
    public static function syncConnection(array $conn) {
+
       $users = self::fetchUsersFromEntra($conn);
 
       foreach ($users as $user) {
          self::syncUser($user);
       }
+
 
       if (!empty($conn['delete_missing']) || !empty($conn['disable_if_disabled'])) {
          self::cleanupUsers($conn, $users);
@@ -188,5 +191,6 @@ class PluginSyncaadSync {
             }
          }
       }
+
    }
 }

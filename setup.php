@@ -18,6 +18,7 @@ function plugin_version_syncaad() {
 function plugin_init_syncaad() {
     global $PLUGIN_HOOKS;
     $PLUGIN_HOOKS['csrf_compliant']['syncaad'] = true;
+
     $PLUGIN_HOOKS['menu_entry']['syncaad'] = true;
     $PLUGIN_HOOKS['config_page']['syncaad'] = 'front/connection.php';
     $PLUGIN_HOOKS['rights']['syncaad'] = 'plugin_syncaad_getRights';
@@ -27,6 +28,7 @@ function plugin_syncaad_getRights() {
     return [
         'syncaad' => __('Gérer les connexions AAD', 'syncaad')
     ];
+
 }
 
 function plugin_install_syncaad() {
@@ -43,6 +45,7 @@ function plugin_install_syncaad() {
             . "`active` tinyint(1) DEFAULT 1,"
             . "PRIMARY KEY (`id`)"
             . ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
     $DB->queryOrDie($query, "Create table glpi_plugin_syncaad_connections");
     return true;
 }
