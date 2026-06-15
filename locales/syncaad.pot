@@ -1,0 +1,109 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Synchro AAD 2.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "A PHP version providing random_bytes() is required by Synchro AAD."
+msgstr ""
+
+msgid "Authentification SSO"
+msgstr ""
+
+msgid "Ce compte est désactivé dans GLPI."
+msgstr ""
+
+msgid "Ce compte ne correspond pas au domaine autorisé pour cette connexion."
+msgstr ""
+
+msgid "Client ID"
+msgstr ""
+
+msgid "Client Secret"
+msgstr ""
+
+msgid "Connexion Entra ID"
+msgid_plural "Connexions Entra ID"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Connexion Entra ID"
+msgstr ""
+
+msgid "Connexion SSO introuvable ou désactivée."
+msgstr ""
+
+msgid "Créer les comptes manquants"
+msgstr ""
+
+msgid "Désactiver les comptes absents"
+msgstr ""
+
+msgid "Entité par défaut (nouveaux comptes)"
+msgstr ""
+
+msgid "Erreur renvoyée par Entra ID : %s"
+msgstr ""
+
+msgid "Ex. : @contoso.com — seuls les comptes dont l'email se termine ainsi sont traités."
+msgstr ""
+
+msgid "Filtre de domaine"
+msgstr ""
+
+msgid "Impossible de récupérer le profil utilisateur depuis Microsoft Graph."
+msgstr ""
+
+msgid "La connexion à GLPI a échoué (aucune habilitation valide ?)."
+msgstr ""
+
+msgid "Laisser vide pour utiliser : %s — cette URL doit être déclarée comme \"Redirect URI\" (type Web) dans Entra ID."
+msgstr ""
+
+msgid "Profil par défaut (nouveaux comptes)"
+msgstr ""
+
+msgid "Requête SSO invalide (state)."
+msgstr ""
+
+msgid "Retour"
+msgstr ""
+
+msgid "SSO activé"
+msgstr ""
+
+msgid "Se connecter avec %s"
+msgstr ""
+
+msgid "Supprimer les comptes absents"
+msgstr ""
+
+msgid "Synchro AAD"
+msgstr ""
+
+msgid "Synchronisation"
+msgstr ""
+
+msgid "Synchronisation complète terminée."
+msgstr ""
+
+msgid "Synchronisation de l'utilisateur terminée."
+msgstr ""
+
+msgid "Synchronisation de la connexion terminée."
+msgstr ""
+
+msgid "Synchroniser toutes les connexions"
+msgstr ""
+
+msgid "Tenant ID"
+msgstr ""
+
+msgid "The PHP \"curl\" extension is required by Synchro AAD."
+msgstr ""
+
+msgid "URL de redirection (Azure)"
+msgstr ""
