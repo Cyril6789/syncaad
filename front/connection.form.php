@@ -2,7 +2,7 @@
 
 include('../../../inc/includes.php');
 
-$connection = new PluginSyncaadConnection();
+$connection = new PluginSsomicrosoftConnection();
 
 if (isset($_POST['add'])) {
     $connection->check(-1, CREATE, $_POST);
@@ -17,20 +17,20 @@ if (isset($_POST['add'])) {
 } elseif (isset($_POST['delete'])) {
     $connection->check($_POST['id'], DELETE);
     $connection->delete($_POST);
-    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/syncaad/front/connection.php');
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/ssomicrosoft/front/connection.php');
 } elseif (isset($_POST['purge'])) {
     $connection->check($_POST['id'], PURGE);
     $connection->delete($_POST, 1);
-    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/syncaad/front/connection.php');
+    Html::redirect($CFG_GLPI['root_doc'] . '/plugins/ssomicrosoft/front/connection.php');
 }
 
-Session::checkRight('plugin_syncaad', READ);
+Session::checkRight('plugin_ssomicrosoft', READ);
 
 Html::header(
-    PluginSyncaadConnection::getTypeName(1),
+    PluginSsomicrosoftConnection::getTypeName(1),
     '',
     'config',
-    'PluginSyncaadConnection'
+    'PluginSsomicrosoftConnection'
 );
 
 $connection->display(['id' => (int) ($_GET['id'] ?? 0)]);

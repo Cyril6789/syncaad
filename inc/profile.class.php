@@ -5,14 +5,14 @@ if (!defined('GLPI_ROOT')) {
 }
 
 /**
- * Manage the Synchro AAD rights from the standard GLPI profile form.
+ * Manage the SSO Microsoft rights from the standard GLPI profile form.
  *
  * Registering this class as a tab on {@see Profile} makes the
- * `plugin_syncaad` right visible and editable through
+ * `plugin_ssomicrosoft` right visible and editable through
  * Administration > Profiles, so a super-admin can grant or revoke access
  * to the plugin without touching the database.
  */
-class PluginSyncaadProfile extends Profile {
+class PluginSsomicrosoftProfile extends Profile {
 
    // We piggyback on the core "profile" right: only users allowed to edit
    // profiles may change the plugin rights matrix.
@@ -26,9 +26,9 @@ class PluginSyncaadProfile extends Profile {
    static function getAllRights() {
       return [
          [
-            'itemtype' => 'PluginSyncaadConnection',
-            'label'    => __('Synchro AAD', 'syncaad'),
-            'field'    => 'plugin_syncaad',
+            'itemtype' => 'PluginSsomicrosoftConnection',
+            'label'    => __('SSO Microsoft', 'ssomicrosoft'),
+            'field'    => 'plugin_ssomicrosoft',
             'rights'   => [
                READ   => __('Read'),
                CREATE => __('Create'),
@@ -46,7 +46,7 @@ class PluginSyncaadProfile extends Profile {
     */
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
       if ($item instanceof Profile && $item->getField('interface') == 'central') {
-         return self::createTabEntry(__('Synchro AAD', 'syncaad'));
+         return self::createTabEntry(__('SSO Microsoft', 'ssomicrosoft'));
       }
       return '';
    }
@@ -127,7 +127,7 @@ class PluginSyncaadProfile extends Profile {
       $profile->displayRightsChoiceMatrix(self::getAllRights(), [
          'canedit'       => $canedit,
          'default_class' => 'tab_bg_2',
-         'title'         => __('Synchro AAD', 'syncaad'),
+         'title'         => __('SSO Microsoft', 'ssomicrosoft'),
       ]);
 
       if ($canedit) {

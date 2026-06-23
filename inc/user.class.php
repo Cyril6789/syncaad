@@ -11,7 +11,7 @@ if (!defined('GLPI_ROOT')) {
  * both create/update GLPI accounts the same way (including e-mail handling
  * through glpi_useremails and default profile assignment).
  */
-class PluginSyncaadUser {
+class PluginSsomicrosoftUser {
 
    /**
     * Normalise a Microsoft Graph user object to the fields we care about.

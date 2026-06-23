@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Synchro AAD 2.0.0\n"
+"Project-Id-Version: SSO Microsoft 2.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-msgid "A PHP version providing random_bytes() is required by Synchro AAD."
-msgstr "Une version de PHP fournissant random_bytes() est requise par Synchro AAD."
+msgid "A PHP version providing random_bytes() is required by SSO Microsoft."
+msgstr "Une version de PHP fournissant random_bytes() est requise par SSO Microsoft."
 
 msgid "Authentification SSO"
 msgstr "Authentification SSO"
@@ -87,11 +87,14 @@ msgstr "Se connecter avec %s"
 msgid "Supprimer les comptes absents"
 msgstr "Supprimer les comptes absents"
 
-msgid "Synchro AAD"
-msgstr "Synchro AAD"
+msgid "SSO Microsoft"
+msgstr "SSO Microsoft"
 
 msgid "Synchronisation"
 msgstr "Synchronisation"
+
+msgid "Synchronisation des comptes depuis Entra ID"
+msgstr "Synchronisation des comptes depuis Entra ID"
 
 msgid "Synchronisation complète terminée."
 msgstr "Synchronisation complète terminée."
@@ -108,8 +111,8 @@ msgstr "Synchroniser toutes les connexions"
 msgid "Tenant ID"
 msgstr "Tenant ID"
 
-msgid "The PHP \"curl\" extension is required by Synchro AAD."
-msgstr "L'extension PHP \"curl\" est requise par Synchro AAD."
+msgid "The PHP \"curl\" extension is required by SSO Microsoft."
+msgstr "L'extension PHP \"curl\" est requise par SSO Microsoft."
 
 msgid "URL de redirection (Azure)"
 msgstr "URL de redirection (Azure)"
