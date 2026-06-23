@@ -54,6 +54,8 @@ ENTRIES = [
     ('Supprimer les comptes absents', None, "Supprimer les comptes absents", "Delete missing accounts"),
     ('Synchro AAD', None, "Synchro AAD", "Synchro AAD"),
     ('Synchronisation', None, "Synchronisation", "Synchronization"),
+    ('Synchronisation des comptes depuis Entra ID', None,
+     "Synchronisation des comptes depuis Entra ID", "Synchronize accounts from Entra ID"),
     ('Synchronisation complète terminée.', None,
      "Synchronisation complète terminée.", "Full synchronization completed."),
     ("Synchronisation de l'utilisateur terminée.", None,

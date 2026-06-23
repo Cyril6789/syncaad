@@ -56,14 +56,29 @@ Dans **Configuration > Synchro AAD**, créez une connexion :
 - **Manuelle** : bouton *Synchroniser toutes les connexions* (page du plugin), ou
   `front/sync.php?connection_id=<id>` pour une connexion, ou
   `front/sync.php?user_id=<id>&connection_id=<id>` pour un utilisateur.
-- **Automatique (cron)** : planifiez le script CLI
+- **Automatique (action GLPI)** — *recommandé* : à l'installation, le plugin
+  enregistre l'action automatique **« syncaad »** (*Synchronisation des comptes
+  depuis Entra ID*). Réglez sa fréquence et son mode dans
+  **Configuration > Actions automatiques > syncaad**. Elle est exécutée par le
+  cron GLPI déjà en place — pratique pour un déploiement **dockerisé** (aucune
+  planification supplémentaire à mettre en place, il suffit que le cron GLPI
+  tourne, p. ex. `php bin/console glpi:cron` ou l'action automatique GLPI de
+  votre image).
+- **Automatique (cron dédié)** — alternative : planifiez directement le script CLI
 
   ```bash
   php /chemin/vers/glpi/plugins/syncaad/scripts/sync.php
   ```
 
-  Les e-mails Entra ID sont stockés dans GLPI via `glpi_useremails` ; le rapprochement
-  se fait sur l'UPN (login) puis sur l'e-mail.
+  En Docker, par exemple via la crontab de l'hôte :
+
+  ```cron
+  */15 * * * * docker exec -u www-data <conteneur_glpi> \
+      php /var/www/glpi/plugins/syncaad/scripts/sync.php >/dev/null 2>&1
+  ```
+
+Les e-mails Entra ID sont stockés dans GLPI via `glpi_useremails` ; le rapprochement
+se fait sur l'UPN (login) puis sur l'e-mail.
 
 ## Connexion SSO
 

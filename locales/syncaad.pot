@@ -93,6 +93,9 @@ msgstr ""
 msgid "Synchronisation"
 msgstr ""
 
+msgid "Synchronisation des comptes depuis Entra ID"
+msgstr ""
+
 msgid "Synchronisation complète terminée."
 msgstr ""
 

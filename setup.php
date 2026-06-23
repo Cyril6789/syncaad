@@ -1,6 +1,6 @@
 <?php
 
-define('PLUGIN_SYNCAAD_VERSION', '2.0.0');
+define('PLUGIN_SYNCAAD_VERSION', '2.1.0');
 
 // Minimal/maximal GLPI version, inclusive/exclusive
 define('PLUGIN_SYNCAAD_MIN_GLPI', '11.0.0');
@@ -308,6 +308,16 @@ function plugin_syncaad_install() {
         }
     }
 
+    // Register the account synchronisation as a GLPI automatic action so it can
+    // be scheduled and monitored from Configuration > Automatic actions and run
+    // by GLPI's own cron. Defaults to hourly, external (CLI) mode; the admin can
+    // adjust frequency and mode from the UI afterwards.
+    CronTask::register('PluginSyncaadSync', 'syncaad', HOUR_TIMESTAMP, [
+        'mode'    => CronTask::MODE_EXTERNAL,
+        'state'   => CronTask::STATE_WAITING,
+        'comment' => 'Synchronisation des comptes Entra ID',
+    ]);
+
     return true;
 }
 
@@ -320,6 +330,10 @@ function plugin_syncaad_uninstall() {
     if ($DB->tableExists('glpi_plugin_syncaad_connections')) {
         $DB->doQuery("DROP TABLE `glpi_plugin_syncaad_connections`");
     }
+
+    // Remove the plugin's automatic action(s).
+    $cron = new CronTask();
+    $cron->deleteByCriteria(['itemtype' => 'PluginSyncaadSync']);
 
     ProfileRight::deleteProfileRights(['plugin_syncaad']);
 

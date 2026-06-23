@@ -10,17 +10,19 @@ if (!defined('GLPI_ROOT')) {
  */
 class PluginSyncaadSync {
 
-   /** Synchronise every active connection. */
-   public static function syncAll(): void {
+   /** Synchronise every active connection. Returns the number of users processed. */
+   public static function syncAll(): int {
       global $DB;
 
+      $total = 0;
       foreach ($DB->request(['FROM' => 'glpi_plugin_syncaad_connections', 'WHERE' => ['active' => 1]]) as $conn) {
-         self::syncConnection($conn);
+         $total += self::syncConnection($conn);
       }
+      return $total;
    }
 
-   /** Synchronise a single connection (full pull). */
-   public static function syncConnection(array $conn): void {
+   /** Synchronise a single connection (full pull). Returns the number of users processed. */
+   public static function syncConnection(array $conn): int {
       $users = self::fetchUsersFromEntra($conn);
 
       foreach ($users as $user) {
@@ -30,6 +32,52 @@ class PluginSyncaadSync {
       if (!empty($conn['delete_missing']) || !empty($conn['disable_if_disabled'])) {
          self::cleanupUsers($conn, $users);
       }
+
+      return count($users);
+   }
+
+   /**
+    * Description shown for the plugin's automatic actions (GLPI cron).
+    *
+    * @param string $name
+    * @return array<string, string>
+    */
+   public static function cronInfo($name): array {
+      if ($name === 'syncaad') {
+         return ['description' => __('Synchronisation des comptes depuis Entra ID', 'syncaad')];
+      }
+      return [];
+   }
+
+   /**
+    * GLPI automatic action: synchronise every active connection.
+    *
+    * Registered as a CronTask so it can be scheduled and monitored from
+    * Configuration > Automatic actions, and driven by GLPI's own cron (handy
+    * for dockerised setups where GLPI's cron already runs).
+    *
+    * @param CronTask $task
+    * @return int 1 if users were processed, 0 if nothing to do, -1 on error.
+    */
+   public static function cronSyncaad(CronTask $task): int {
+      global $DB;
+
+      $connections = 0;
+      $users       = 0;
+      foreach ($DB->request(['FROM' => 'glpi_plugin_syncaad_connections', 'WHERE' => ['active' => 1]]) as $conn) {
+         $count = self::syncConnection($conn);
+         $users += $count;
+         $connections++;
+         $task->addVolume($count);
+      }
+
+      $task->log(sprintf(
+         '%d connexion(s), %d compte(s) traité(s).',
+         $connections,
+         $users
+      ));
+
+      return $connections > 0 ? 1 : 0;
    }
 
    /** Refresh a single GLPI user from Entra ID. */

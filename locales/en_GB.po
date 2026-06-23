@@ -93,6 +93,9 @@ msgstr "Synchro AAD"
 msgid "Synchronisation"
 msgstr "Synchronization"
 
+msgid "Synchronisation des comptes depuis Entra ID"
+msgstr "Synchronize accounts from Entra ID"
+
 msgid "Synchronisation complète terminée."
 msgstr "Full synchronization completed."
 
