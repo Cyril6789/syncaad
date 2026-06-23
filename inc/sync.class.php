@@ -8,14 +8,14 @@ if (!defined('GLPI_ROOT')) {
  * Synchronisation engine: pulls users from Entra ID (Microsoft Graph) using the
  * client-credentials flow and reflects them into GLPI.
  */
-class PluginSyncaadSync {
+class PluginSsomicrosoftSync {
 
    /** Synchronise every active connection. Returns the number of users processed. */
    public static function syncAll(): int {
       global $DB;
 
       $total = 0;
-      foreach ($DB->request(['FROM' => 'glpi_plugin_syncaad_connections', 'WHERE' => ['active' => 1]]) as $conn) {
+      foreach ($DB->request(['FROM' => 'glpi_plugin_ssomicrosoft_connections', 'WHERE' => ['active' => 1]]) as $conn) {
          $total += self::syncConnection($conn);
       }
       return $total;
@@ -26,7 +26,7 @@ class PluginSyncaadSync {
       $users = self::fetchUsersFromEntra($conn);
 
       foreach ($users as $user) {
-         PluginSyncaadUser::upsert($user, $conn, true);
+         PluginSsomicrosoftUser::upsert($user, $conn, true);
       }
 
       if (!empty($conn['delete_missing']) || !empty($conn['disable_if_disabled'])) {
@@ -43,8 +43,8 @@ class PluginSyncaadSync {
     * @return array<string, string>
     */
    public static function cronInfo($name): array {
-      if ($name === 'syncaad') {
-         return ['description' => __('Synchronisation des comptes depuis Entra ID', 'syncaad')];
+      if ($name === 'ssomicrosoft') {
+         return ['description' => __('Synchronisation des comptes depuis Entra ID', 'ssomicrosoft')];
       }
       return [];
    }
@@ -59,12 +59,12 @@ class PluginSyncaadSync {
     * @param CronTask $task
     * @return int 1 if users were processed, 0 if nothing to do, -1 on error.
     */
-   public static function cronSyncaad(CronTask $task): int {
+   public static function cronSsomicrosoft(CronTask $task): int {
       global $DB;
 
       $connections = 0;
       $users       = 0;
-      foreach ($DB->request(['FROM' => 'glpi_plugin_syncaad_connections', 'WHERE' => ['active' => 1]]) as $conn) {
+      foreach ($DB->request(['FROM' => 'glpi_plugin_ssomicrosoft_connections', 'WHERE' => ['active' => 1]]) as $conn) {
          $count = self::syncConnection($conn);
          $users += $count;
          $connections++;
@@ -85,7 +85,7 @@ class PluginSyncaadSync {
       global $DB;
 
       $crit = $connection_id ? ['id' => $connection_id] : ['active' => 1];
-      $conn = $DB->request(['FROM' => 'glpi_plugin_syncaad_connections', 'WHERE' => $crit, 'LIMIT' => 1])->current();
+      $conn = $DB->request(['FROM' => 'glpi_plugin_ssomicrosoft_connections', 'WHERE' => $crit, 'LIMIT' => 1])->current();
       if (!$conn) {
          return;
       }
@@ -102,7 +102,7 @@ class PluginSyncaadSync {
 
       $aad = self::fetchUserByEmail($conn, $email);
       if ($aad) {
-         PluginSyncaadUser::upsert($aad, $conn, false);
+         PluginSsomicrosoftUser::upsert($aad, $conn, false);
       }
    }
 
@@ -120,7 +120,7 @@ class PluginSyncaadSync {
       $select = 'id,displayName,mail,userPrincipalName,givenName,surname,accountEnabled';
       $url    = 'https://graph.microsoft.com/v1.0/users?$select=' . $select . '&$top=999';
 
-      $domains = PluginSyncaadConnection::parseEmailFilters($conn['email_filter'] ?? '');
+      $domains = PluginSsomicrosoftConnection::parseEmailFilters($conn['email_filter'] ?? '');
       if (!empty($domains)) {
          $clauses = [];
          foreach ($domains as $domain) {
@@ -221,7 +221,7 @@ class PluginSyncaadSync {
       }
 
       $where = ['glpi_users.is_deleted' => 0];
-      $domains = PluginSyncaadConnection::parseEmailFilters($conn['email_filter'] ?? '');
+      $domains = PluginSsomicrosoftConnection::parseEmailFilters($conn['email_filter'] ?? '');
       if (!empty($domains)) {
          $or = [];
          foreach ($domains as $domain) {

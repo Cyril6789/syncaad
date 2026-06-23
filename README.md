@@ -1,6 +1,6 @@
-# Synchro AAD
+# SSO Microsoft
 
-Plugin GLPI **« Synchro AAD »** permettant de synchroniser les utilisateurs depuis **Microsoft Entra ID** (ex-Azure AD) et de proposer une **connexion SSO** (OpenID Connect / OAuth 2.0) aux utilisateurs GLPI.
+Plugin GLPI **« SSO Microsoft »** permettant de synchroniser les utilisateurs depuis **Microsoft Entra ID** (ex-Azure AD) et de proposer une **connexion SSO** (OpenID Connect / OAuth 2.0) aux utilisateurs GLPI.
 
 - Compatible **GLPI 11.x** (testé pour la branche 11.0).
 - Gère plusieurs connexions Entra ID indépendantes.
@@ -17,20 +17,20 @@ Plugin GLPI **« Synchro AAD »** permettant de synchroniser les utilisateurs de
 
 ## Installation
 
-1. Copier le dossier du plugin dans `plugins/syncaad` de votre installation GLPI.
-2. Dans GLPI, aller dans **Configuration > Plugins**, puis **installer** et **activer** « Synchro AAD ».
-3. Le menu apparaît dans **Configuration > Synchro AAD** (droit `plugin_syncaad`).
+1. Copier le dossier du plugin dans `plugins/ssomicrosoft` de votre installation GLPI.
+2. Dans GLPI, aller dans **Configuration > Plugins**, puis **installer** et **activer** « SSO Microsoft ».
+3. Le menu apparaît dans **Configuration > SSO Microsoft** (droit `plugin_ssomicrosoft`).
 
-> Le droit `plugin_syncaad` est accordé automatiquement au profil **Super-Admin**
+> Le droit `plugin_ssomicrosoft` est accordé automatiquement au profil **Super-Admin**
 > (et au profil de l'installateur) lors de l'installation. Il est ensuite visible
 > et modifiable pour chaque profil via **Administration > Profils > onglet
-> « Synchro AAD »**.
+> « SSO Microsoft »**.
 
 ## Enregistrement de l'application dans Entra ID
 
 Dans le portail Entra ID (Azure) → **App registrations** → **New registration** :
 
-1. **Redirect URI** (type *Web*) : `https://<votre-glpi>/plugins/syncaad/front/sso.php`
+1. **Redirect URI** (type *Web*) : `https://<votre-glpi>/plugins/ssomicrosoft/front/sso.php`
    (cette URL est rappelée dans le formulaire de connexion du plugin ; laissez le champ vide pour utiliser la valeur par défaut).
 2. Récupérez le **Application (client) ID** et le **Directory (tenant) ID**.
 3. Créez un **client secret** (Certificates & secrets) et notez sa valeur.
@@ -40,7 +40,7 @@ Dans le portail Entra ID (Azure) → **App registrations** → **New registratio
 
 ## Configuration dans GLPI
 
-Dans **Configuration > Synchro AAD**, créez une connexion :
+Dans **Configuration > SSO Microsoft**, créez une connexion :
 
 - **Tenant ID**, **Client ID**, **Client Secret**.
 - **Filtre de domaine** : ex. `@contoso.com`. Seuls les comptes dont l'e-mail/UPN se termine ainsi sont traités/autorisés. Pour autoriser plusieurs domaines, séparez-les par une **virgule** ou un **point-virgule** : `@contoso.com, @fabrikam.com`.
@@ -57,9 +57,9 @@ Dans **Configuration > Synchro AAD**, créez une connexion :
   `front/sync.php?connection_id=<id>` pour une connexion, ou
   `front/sync.php?user_id=<id>&connection_id=<id>` pour un utilisateur.
 - **Automatique (action GLPI)** — *recommandé* : à l'installation, le plugin
-  enregistre l'action automatique **« syncaad »** (*Synchronisation des comptes
+  enregistre l'action automatique **« ssomicrosoft »** (*Synchronisation des comptes
   depuis Entra ID*). Réglez sa fréquence et son mode dans
-  **Configuration > Actions automatiques > syncaad**. Elle est exécutée par le
+  **Configuration > Actions automatiques > ssomicrosoft**. Elle est exécutée par le
   cron GLPI déjà en place — pratique pour un déploiement **dockerisé** (aucune
   planification supplémentaire à mettre en place, il suffit que le cron GLPI
   tourne, p. ex. `php bin/console glpi:cron` ou l'action automatique GLPI de
@@ -67,14 +67,14 @@ Dans **Configuration > Synchro AAD**, créez une connexion :
 - **Automatique (cron dédié)** — alternative : planifiez directement le script CLI
 
   ```bash
-  php /chemin/vers/glpi/plugins/syncaad/scripts/sync.php
+  php /chemin/vers/glpi/plugins/ssomicrosoft/scripts/sync.php
   ```
 
   En Docker, par exemple via la crontab de l'hôte :
 
   ```cron
   */15 * * * * docker exec -u www-data <conteneur_glpi> \
-      php /var/www/glpi/plugins/syncaad/scripts/sync.php >/dev/null 2>&1
+      php /var/www/glpi/plugins/ssomicrosoft/scripts/sync.php >/dev/null 2>&1
   ```
 
 Les e-mails Entra ID sont stockés dans GLPI via `glpi_useremails` ; le rapprochement

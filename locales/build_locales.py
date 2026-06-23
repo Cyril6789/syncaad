@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate Synchro AAD .pot/.po/.mo locale files (no gettext tooling needed)."""
+"""Generate SSO Microsoft .pot/.po/.mo locale files (no gettext tooling needed)."""
 import os
 import struct
 
@@ -7,9 +7,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 # (msgid, msgid_plural_or_None, fr_msgstr_or_tuple, en_msgstr_or_tuple)
 ENTRIES = [
-    ('A PHP version providing random_bytes() is required by Synchro AAD.', None,
-     "Une version de PHP fournissant random_bytes() est requise par Synchro AAD.",
-     "A PHP version providing random_bytes() is required by Synchro AAD."),
+    ('A PHP version providing random_bytes() is required by SSO Microsoft.', None,
+     "Une version de PHP fournissant random_bytes() est requise par SSO Microsoft.",
+     "A PHP version providing random_bytes() is required by SSO Microsoft."),
     ('Authentification SSO', None, "Authentification SSO", "SSO authentication"),
     ('Ce compte est désactivé dans GLPI.', None,
      "Ce compte est désactivé dans GLPI.", "This account is disabled in GLPI."),
@@ -52,7 +52,7 @@ ENTRIES = [
     ('SSO activé', None, "SSO activé", "SSO enabled"),
     ('Se connecter avec %s', None, "Se connecter avec %s", "Sign in with %s"),
     ('Supprimer les comptes absents', None, "Supprimer les comptes absents", "Delete missing accounts"),
-    ('Synchro AAD', None, "Synchro AAD", "Synchro AAD"),
+    ('SSO Microsoft', None, "SSO Microsoft", "SSO Microsoft"),
     ('Synchronisation', None, "Synchronisation", "Synchronization"),
     ('Synchronisation des comptes depuis Entra ID', None,
      "Synchronisation des comptes depuis Entra ID", "Synchronize accounts from Entra ID"),
@@ -65,14 +65,14 @@ ENTRIES = [
     ('Synchroniser toutes les connexions', None,
      "Synchroniser toutes les connexions", "Synchronize all connections"),
     ('Tenant ID', None, "Tenant ID", "Tenant ID"),
-    ('The PHP "curl" extension is required by Synchro AAD.', None,
-     'L\'extension PHP "curl" est requise par Synchro AAD.',
-     'The PHP "curl" extension is required by Synchro AAD.'),
+    ('The PHP "curl" extension is required by SSO Microsoft.', None,
+     'L\'extension PHP "curl" est requise par SSO Microsoft.',
+     'The PHP "curl" extension is required by SSO Microsoft.'),
     ('URL de redirection (Azure)', None, "URL de redirection (Azure)", "Redirect URL (Azure)"),
 ]
 
 HEADER = (
-    "Project-Id-Version: Synchro AAD 2.0.0\n"
+    "Project-Id-Version: SSO Microsoft 2.1.0\n"
     "Report-Msgid-Bugs-To: \n"
     "MIME-Version: 1.0\n"
     "Content-Type: text/plain; charset=UTF-8\n"
@@ -149,7 +149,7 @@ def write_mo(path, lang):
         f.write(out)
 
 
-write_po(os.path.join(HERE, 'syncaad.pot'), None)
+write_po(os.path.join(HERE, 'ssomicrosoft.pot'), None)
 write_po(os.path.join(HERE, 'fr_FR.po'), 'fr')
 write_po(os.path.join(HERE, 'en_GB.po'), 'en')
 write_mo(os.path.join(HERE, 'fr_FR.mo'), 'fr')
