@@ -19,8 +19,17 @@ msgstr "No active connection to synchronize."
 msgid "Connexion « %1$s » : %2$d compte(s) reçu(s) de Microsoft, %3$d traité(s) après filtre de domaine."
 msgstr "Connection \"%1$s\": %2$d account(s) received from Microsoft, %3$d processed after the domain filter."
 
+msgid "Application Entra ID (App registration) : renseignez le Tenant ID, le Client ID et la « Value » du Client Secret. La synchronisation utilise le flux « client credentials » : dans l'application, ajoutez la permission de type Application « Microsoft Graph → User.Read.All » puis cliquez sur « Accorder un consentement administrateur ». ⚠️ Une permission Déléguée ne suffit PAS pour la synchronisation."
+msgstr "Entra ID application (App registration): fill in the Tenant ID, Client ID and the Client Secret \"Value\". Synchronization uses the \"client credentials\" flow: in the application, add the Application-type permission \"Microsoft Graph → User.Read.All\" then click \"Grant admin consent\". Warning: a Delegated permission is NOT enough for synchronization."
+
 msgid "Authentification SSO"
 msgstr "SSO authentication"
+
+msgid "La synchronisation périodique est assurée par l'action automatique « ssomicrosoft » (Synchronisation des comptes depuis Entra ID), planifiable dans Configuration → Actions automatiques. Une synchronisation immédiate est possible via le bouton « Synchroniser toutes les connexions » sur la liste des connexions."
+msgstr "Periodic synchronization is performed by the \"ssomicrosoft\" automatic action (Synchronize accounts from Entra ID), schedulable under Setup → Automatic actions. An immediate synchronization is available through the \"Synchronize all connections\" button on the connections list."
+
+msgid "Le SSO utilise le flux délégué (OpenID Connect). Dans l'application Entra ID, ajoutez les permissions Déléguées « openid », « profile », « email » et « User.Read », et déclarez l'URL de redirection (ci-dessous) comme « Redirect URI » de type Web."
+msgstr "SSO uses the delegated flow (OpenID Connect). In the Entra ID application, add the Delegated permissions \"openid\", \"profile\", \"email\" and \"User.Read\", and declare the redirect URL (below) as a Web-type \"Redirect URI\"."
 
 msgid "Ce compte est désactivé dans GLPI."
 msgstr "This account is disabled in GLPI."

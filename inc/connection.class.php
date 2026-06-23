@@ -120,6 +120,11 @@ class PluginSsomicrosoftConnection extends CommonDBTM {
 
       echo '<tr><th colspan="4">' . __('Connexion Entra ID', 'ssomicrosoft') . '</th></tr>';
 
+      echo '<tr class="tab_bg_1"><td colspan="4"><span class="text-muted">'
+         . '<i class="ti ti-info-circle me-1"></i>'
+         . __("Application Entra ID (App registration) : renseignez le Tenant ID, le Client ID et la « Value » du Client Secret. La synchronisation utilise le flux « client credentials » : dans l'application, ajoutez la permission de type Application « Microsoft Graph → User.Read.All » puis cliquez sur « Accorder un consentement administrateur ». ⚠️ Une permission Déléguée ne suffit PAS pour la synchronisation.", 'ssomicrosoft')
+         . '</span></td></tr>';
+
       echo '<tr class="tab_bg_1">';
       echo '<td>' . __('Tenant ID', 'ssomicrosoft') . '</td>';
       echo '<td>' . Html::input('tenant_id', ['value' => $this->fields['tenant_id'], 'size' => 40]) . '</td>';
@@ -145,6 +150,11 @@ class PluginSsomicrosoftConnection extends CommonDBTM {
 
       echo '<tr><th colspan="4">' . __('Synchronisation', 'ssomicrosoft') . '</th></tr>';
 
+      echo '<tr class="tab_bg_1"><td colspan="4"><span class="text-muted">'
+         . '<i class="ti ti-clock me-1"></i>'
+         . __("La synchronisation périodique est assurée par l'action automatique « ssomicrosoft » (Synchronisation des comptes depuis Entra ID), planifiable dans Configuration → Actions automatiques. Une synchronisation immédiate est possible via le bouton « Synchroniser toutes les connexions » sur la liste des connexions.", 'ssomicrosoft')
+         . '</span></td></tr>';
+
       echo '<tr class="tab_bg_1">';
       echo '<td>' . __('Désactiver les comptes absents', 'ssomicrosoft') . '</td>';
       echo '<td>';
@@ -157,6 +167,11 @@ class PluginSsomicrosoftConnection extends CommonDBTM {
       echo '</tr>';
 
       echo '<tr><th colspan="4">' . __('Authentification SSO', 'ssomicrosoft') . '</th></tr>';
+
+      echo '<tr class="tab_bg_1"><td colspan="4"><span class="text-muted">'
+         . '<i class="ti ti-info-circle me-1"></i>'
+         . __("Le SSO utilise le flux délégué (OpenID Connect). Dans l'application Entra ID, ajoutez les permissions Déléguées « openid », « profile », « email » et « User.Read », et déclarez l'URL de redirection (ci-dessous) comme « Redirect URI » de type Web.", 'ssomicrosoft')
+         . '</span></td></tr>';
 
       echo '<tr class="tab_bg_1">';
       echo '<td>' . __('SSO activé', 'ssomicrosoft') . '</td>';

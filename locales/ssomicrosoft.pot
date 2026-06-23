@@ -19,7 +19,16 @@ msgstr ""
 msgid "Connexion « %1$s » : %2$d compte(s) reçu(s) de Microsoft, %3$d traité(s) après filtre de domaine."
 msgstr ""
 
+msgid "Application Entra ID (App registration) : renseignez le Tenant ID, le Client ID et la « Value » du Client Secret. La synchronisation utilise le flux « client credentials » : dans l'application, ajoutez la permission de type Application « Microsoft Graph → User.Read.All » puis cliquez sur « Accorder un consentement administrateur ». ⚠️ Une permission Déléguée ne suffit PAS pour la synchronisation."
+msgstr ""
+
 msgid "Authentification SSO"
+msgstr ""
+
+msgid "La synchronisation périodique est assurée par l'action automatique « ssomicrosoft » (Synchronisation des comptes depuis Entra ID), planifiable dans Configuration → Actions automatiques. Une synchronisation immédiate est possible via le bouton « Synchroniser toutes les connexions » sur la liste des connexions."
+msgstr ""
+
+msgid "Le SSO utilise le flux délégué (OpenID Connect). Dans l'application Entra ID, ajoutez les permissions Déléguées « openid », « profile », « email » et « User.Read », et déclarez l'URL de redirection (ci-dessous) comme « Redirect URI » de type Web."
 msgstr ""
 
 msgid "Ce compte est désactivé dans GLPI."
