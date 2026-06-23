@@ -23,6 +23,16 @@ class PluginSsomicrosoftSync {
 
    /** Synchronise a single connection (full pull). Returns the number of users processed. */
    public static function syncConnection(array $conn): int {
+      return self::runConnection($conn)['scoped'];
+   }
+
+   /**
+    * Synchronise a single connection and return diagnostic counts.
+    *
+    * @return array{fetched:int, scoped:int} fetched = users received from Entra,
+    *         scoped = users kept after the domain filter (and processed).
+    */
+   public static function runConnection(array $conn): array {
       $users   = self::fetchUsersFromEntra($conn);
       $domains = PluginSsomicrosoftConnection::parseEmailFilters($conn['email_filter'] ?? '');
       $scoped  = self::filterByDomain($users, $domains);
@@ -35,7 +45,19 @@ class PluginSsomicrosoftSync {
          self::cleanupUsers($conn, $scoped);
       }
 
-      return count($scoped);
+      // Key diagnostic line: "X reçus d'Entra, Y après filtre de domaine".
+      // 0 reçus => problème d'authentification/permission (voir lignes GET/POST).
+      // Beaucoup reçus mais 0 après filtre => filtre de domaine trop restrictif.
+      self::log(sprintf(
+         'Connexion "%s" (id %d) : %d compte(s) reçu(s) d\'Entra, %d après filtre de domaine [%s].',
+         (string) ($conn['name'] ?? '?'),
+         (int) ($conn['id'] ?? 0),
+         count($users),
+         count($scoped),
+         implode(', ', $domains) ?: 'aucun filtre'
+      ));
+
+      return ['fetched' => count($users), 'scoped' => count($scoped)];
    }
 
    /**
@@ -122,18 +144,30 @@ class PluginSsomicrosoftSync {
       global $DB;
 
       $connections = 0;
-      $users       = 0;
+      $fetched     = 0;
+      $scoped      = 0;
       foreach ($DB->request(['FROM' => 'glpi_plugin_ssomicrosoft_connections', 'WHERE' => ['active' => 1]]) as $conn) {
-         $count = self::syncConnection($conn);
-         $users += $count;
+         $result   = self::runConnection($conn);
+         $fetched += $result['fetched'];
+         $scoped  += $result['scoped'];
          $connections++;
-         $task->addVolume($count);
+         $task->addVolume($result['scoped']);
+
+         $task->log(sprintf(
+            'Connexion "%s" : %d reçus d\'Entra, %d après filtre.',
+            (string) ($conn['name'] ?? '?'),
+            $result['fetched'],
+            $result['scoped']
+         ));
       }
 
       $task->log(sprintf(
-         '%d connexion(s), %d compte(s) traité(s).',
+         '%d connexion(s) ; %d compte(s) reçus d\'Entra, %d traités après filtre. '
+         . 'Si 0 reçu : vérifiez la permission Application "User.Read.All" (+ consentement admin). '
+         . 'Détails dans files/_log/ssomicrosoft.log.',
          $connections,
-         $users
+         $fetched,
+         $scoped
       ));
 
       return $connections > 0 ? 1 : 0;
@@ -173,6 +207,7 @@ class PluginSsomicrosoftSync {
    private static function fetchUsersFromEntra(array $conn): array {
       $token = self::getAccessToken($conn);
       if (!$token) {
+         self::log('Aucun jeton d\'accès : synchronisation impossible pour cette connexion.');
          return [];
       }
 
@@ -247,11 +282,16 @@ class PluginSsomicrosoftSync {
          'grant_type'    => 'client_credentials',
       ]);
       if ($response === null) {
+         self::log('Échec de récupération du jeton (client credentials). Vérifiez tenant/client/secret.');
          return false;
       }
 
       $token = json_decode($response, true);
-      return $token['access_token'] ?? false;
+      if (empty($token['access_token'])) {
+         self::log('Réponse du jeton sans access_token : ' . substr($response, 0, 500));
+         return false;
+      }
+      return $token['access_token'];
    }
 
    /**
@@ -332,6 +372,11 @@ class PluginSsomicrosoftSync {
       return $row ? (string) $row['email'] : '';
    }
 
+   /** Write a diagnostic line to the plugin log file (files/_log/ssomicrosoft.log). */
+   private static function log(string $message): void {
+      Toolbox::logInFile('ssomicrosoft', $message . "\n");
+   }
+
    /** Perform an HTTP GET request, returning the body or null on failure. */
    private static function httpGet(string $url, array $headers = []): ?string {
       $ch = curl_init($url);
@@ -340,9 +385,15 @@ class PluginSsomicrosoftSync {
       curl_setopt($ch, CURLOPT_TIMEOUT, 30);
       $response = curl_exec($ch);
       $status   = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+      $error    = curl_error($ch);
       curl_close($ch);
 
-      if ($response === false || $status < 200 || $status >= 300) {
+      if ($response === false) {
+         self::log("GET cURL error: {$error} — {$url}");
+         return null;
+      }
+      if ($status < 200 || $status >= 300) {
+         self::log("GET HTTP {$status} — {$url} — " . substr((string) $response, 0, 800));
          return null;
       }
       return (string) $response;
@@ -357,9 +408,15 @@ class PluginSsomicrosoftSync {
       curl_setopt($ch, CURLOPT_TIMEOUT, 30);
       $response = curl_exec($ch);
       $status   = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+      $error    = curl_error($ch);
       curl_close($ch);
 
-      if ($response === false || $status < 200 || $status >= 300) {
+      if ($response === false) {
+         self::log("POST cURL error: {$error} — {$url}");
+         return null;
+      }
+      if ($status < 200 || $status >= 300) {
+         self::log("POST HTTP {$status} — {$url} — " . substr((string) $response, 0, 800));
          return null;
       }
       return (string) $response;
