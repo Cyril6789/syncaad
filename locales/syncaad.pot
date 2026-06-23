@@ -36,7 +36,7 @@ msgstr ""
 msgid "Connexion SSO introuvable ou désactivée."
 msgstr ""
 
-msgid "Connexion classique"
+msgid "Connexion GLPI"
 msgstr ""
 
 msgid "Continuer"

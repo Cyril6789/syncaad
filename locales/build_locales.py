@@ -24,7 +24,7 @@ ENTRIES = [
     ('Connexion Entra ID', None, "Connexion Entra ID", "Entra ID connection"),
     ('Connexion SSO introuvable ou désactivée.', None,
      "Connexion SSO introuvable ou désactivée.", "SSO connection not found or disabled."),
-    ('Connexion classique', None, "Connexion classique", "Standard login"),
+    ('Connexion GLPI', None, "Connexion GLPI", "GLPI login"),
     ('Continuer', None, "Continuer", "Continue"),
     ('Créer les comptes manquants', None, "Créer les comptes manquants", "Create missing accounts"),
     ('Désactiver les comptes absents', None, "Désactiver les comptes absents", "Disable missing accounts"),

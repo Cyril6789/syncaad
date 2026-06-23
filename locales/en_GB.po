@@ -36,8 +36,8 @@ msgstr "Entra ID connection"
 msgid "Connexion SSO introuvable ou désactivée."
 msgstr "SSO connection not found or disabled."
 
-msgid "Connexion classique"
-msgstr "Standard login"
+msgid "Connexion GLPI"
+msgstr "GLPI login"
 
 msgid "Continuer"
 msgstr "Continue"

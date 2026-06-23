@@ -36,8 +36,8 @@ msgstr "Connexion Entra ID"
 msgid "Connexion SSO introuvable ou désactivée."
 msgstr "Connexion SSO introuvable ou désactivée."
 
-msgid "Connexion classique"
-msgstr "Connexion classique"
+msgid "Connexion GLPI"
+msgstr "Connexion GLPI"
 
 msgid "Continuer"
 msgstr "Continuer"

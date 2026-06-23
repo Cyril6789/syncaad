@@ -126,11 +126,46 @@ function plugin_syncaad_display_login() {
     echo '</div>';
 
     // When SSO is available it becomes the primary way to sign in: promote the
-    // SSO buttons above the standard form and fold the latter into a collapsed
-    // accordion ("secondary" login). Done client-side because the standard form
-    // is rendered by GLPI itself, in a position we cannot control from the hook.
-    $accordion_label = json_encode(__('Connexion classique', 'syncaad'), JSON_UNESCAPED_UNICODE);
-    echo <<<JS
+    // SSO buttons above the standard form and fold the latter behind a discreet
+    // toggle ("Connexion GLPI"). Done client-side because the standard form is
+    // rendered by GLPI itself, in a position we cannot control from the hook.
+    // Everything is kept inside the form's own container so it stays the exact
+    // same width as the standard login form.
+    $toggle_label = json_encode(__('Connexion GLPI', 'syncaad'), JSON_UNESCAPED_UNICODE);
+    echo <<<HTML
+<style>
+.plugin-syncaad-sso { margin-bottom: .25rem; }
+.plugin-syncaad-classic { margin-top: 1rem; }
+.plugin-syncaad-divider {
+   border: 0;
+   border-top: 1px solid var(--bs-border-color, #dee2e6);
+   margin: 0;
+}
+.plugin-syncaad-toggle {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: .35rem;
+   width: 100%;
+   margin: 0;
+   padding: .5rem 0;
+   background: transparent;
+   border: 0;
+   color: var(--bs-secondary-color, #6c757d);
+   font-size: .8125rem;
+   line-height: 1.2;
+   cursor: pointer;
+}
+.plugin-syncaad-toggle:hover,
+.plugin-syncaad-toggle:focus-visible { color: var(--bs-body-color, #212529); }
+.plugin-syncaad-toggle .ti {
+   font-size: 1rem;
+   transition: transform .2s ease;
+}
+.plugin-syncaad-toggle[aria-expanded="true"] .ti { transform: rotate(180deg); }
+.plugin-syncaad-classic-body { margin-top: .5rem; }
+.plugin-syncaad-classic-body[hidden] { display: none; }
+</style>
 <script type="text/javascript">
 (function() {
    function init() {
@@ -142,34 +177,33 @@ function plugin_syncaad_display_login() {
       if (!form || form.dataset.syncaadDone) { return; }
       form.dataset.syncaadDone = '1';
 
-      var acc = document.createElement('div');
-      acc.className = 'accordion plugin-syncaad-classic mt-2 mb-2';
-      acc.innerHTML =
-         '<div class="accordion-item">' +
-            '<h2 class="accordion-header">' +
-               '<button class="accordion-button collapsed" type="button" aria-expanded="false">' +
-                  {$accordion_label} +
-               '</button>' +
-            '</h2>' +
-            '<div class="accordion-collapse collapse">' +
-               '<div class="accordion-body"></div>' +
-            '</div>' +
-         '</div>';
+      var box = document.createElement('div');
+      box.className = 'plugin-syncaad-classic';
+      box.innerHTML =
+         '<hr class="plugin-syncaad-divider">' +
+         '<button type="button" class="plugin-syncaad-toggle" aria-expanded="false">' +
+            '<span>' + {$toggle_label} + '</span>' +
+            '<i class="ti ti-chevron-down" aria-hidden="true"></i>' +
+         '</button>' +
+         '<div class="plugin-syncaad-classic-body" hidden></div>';
 
-      // Re-order: SSO buttons, then the collapsed classic form.
+      // Re-order: SSO buttons first, then the collapsed standard form, all
+      // inside the form's original container so widths match exactly.
       var parent = form.parentNode;
       parent.insertBefore(sso, form);
-      parent.insertBefore(acc, form);
-      acc.querySelector('.accordion-body').appendChild(form);
+      parent.insertBefore(box, form);
+      box.querySelector('.plugin-syncaad-classic-body').appendChild(form);
 
-      // Self-managed toggle so it works with Bootstrap's CSS alone (no JS dep).
-      var btn  = acc.querySelector('.accordion-button');
-      var body = acc.querySelector('.accordion-collapse');
-      btn.addEventListener('click', function(e) {
-         e.preventDefault();
-         var shown = body.classList.toggle('show');
-         btn.classList.toggle('collapsed', !shown);
-         btn.setAttribute('aria-expanded', shown ? 'true' : 'false');
+      var btn  = box.querySelector('.plugin-syncaad-toggle');
+      var body = box.querySelector('.plugin-syncaad-classic-body');
+      btn.addEventListener('click', function() {
+         var collapsed = body.hasAttribute('hidden');
+         if (collapsed) {
+            body.removeAttribute('hidden');
+         } else {
+            body.setAttribute('hidden', '');
+         }
+         btn.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
       });
    }
 
@@ -180,7 +214,7 @@ function plugin_syncaad_display_login() {
    }
 })();
 </script>
-JS;
+HTML;
 }
 
 /**
