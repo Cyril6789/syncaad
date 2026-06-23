@@ -124,7 +124,12 @@ class PluginSsomicrosoftSync {
       if (!empty($domains)) {
          $clauses = [];
          foreach ($domains as $domain) {
-            $clauses[] = "endsWith(mail,'" . str_replace("'", "''", $domain) . "')";
+            $safe = str_replace("'", "''", $domain);
+            // Match on both mail and userPrincipalName: many Entra accounts have
+            // no mailbox (mail = null) but a UPN on the filtered domain, and
+            // would otherwise be skipped entirely (never created in GLPI).
+            $clauses[] = "endsWith(mail,'{$safe}')";
+            $clauses[] = "endsWith(userPrincipalName,'{$safe}')";
          }
          // Advanced query (endsWith) requires ConsistencyLevel + $count.
          $url .= '&$count=true&$filter=' . rawurlencode(implode(' or ', $clauses));
