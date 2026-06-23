@@ -23,17 +23,76 @@ class PluginSsomicrosoftSync {
 
    /** Synchronise a single connection (full pull). Returns the number of users processed. */
    public static function syncConnection(array $conn): int {
-      $users = self::fetchUsersFromEntra($conn);
+      $users   = self::fetchUsersFromEntra($conn);
+      $domains = PluginSsomicrosoftConnection::parseEmailFilters($conn['email_filter'] ?? '');
+      $scoped  = self::filterByDomain($users, $domains);
 
-      foreach ($users as $user) {
+      foreach ($scoped as $user) {
          PluginSsomicrosoftUser::upsert($user, $conn, true);
       }
 
       if (!empty($conn['delete_missing']) || !empty($conn['disable_if_disabled'])) {
-         self::cleanupUsers($conn, $users);
+         self::cleanupUsers($conn, $scoped);
       }
 
-      return count($users);
+      return count($scoped);
+   }
+
+   /**
+    * Keep only the Entra users whose domain matches the connection filter.
+    *
+    * An empty filter keeps every user. A user matches if any of its e-mail
+    * carrying attributes (mail, userPrincipalName, otherMails, proxyAddresses
+    * aliases) ends with one of the configured domains.
+    *
+    * @param array<int, array> $users
+    * @param string[]          $domains
+    * @return array<int, array>
+    */
+   private static function filterByDomain(array $users, array $domains): array {
+      if (empty($domains)) {
+         return $users;
+      }
+
+      $scoped = [];
+      foreach ($users as $user) {
+         if (self::userMatchesDomains($user, $domains)) {
+            $scoped[] = $user;
+         }
+      }
+      return $scoped;
+   }
+
+   /** Does any e-mail-bearing attribute of the user end with one of the domains? */
+   private static function userMatchesDomains(array $user, array $domains): bool {
+      $candidates = [];
+
+      foreach (['mail', 'userPrincipalName'] as $key) {
+         if (!empty($user[$key])) {
+            $candidates[] = strtolower((string) $user[$key]);
+         }
+      }
+      foreach ((array) ($user['otherMails'] ?? []) as $address) {
+         if ($address !== '') {
+            $candidates[] = strtolower((string) $address);
+         }
+      }
+      foreach ((array) ($user['proxyAddresses'] ?? []) as $address) {
+         // Entries look like "SMTP:user@domain" (primary) or "smtp:alias@domain".
+         $address = preg_replace('/^smtp:/i', '', (string) $address);
+         if ($address !== '') {
+            $candidates[] = strtolower($address);
+         }
+      }
+
+      foreach ($candidates as $value) {
+         foreach ($domains as $domain) {
+            if (str_ends_with($value, $domain)) {
+               return true;
+            }
+         }
+      }
+      return false;
    }
 
    /**
@@ -117,23 +176,15 @@ class PluginSsomicrosoftSync {
          return [];
       }
 
-      $select = 'id,displayName,mail,userPrincipalName,givenName,surname,accountEnabled';
+      // Select every attribute that can carry the account's domain, including
+      // aliases (proxyAddresses) and secondary addresses (otherMails). The
+      // domain filtering is then done client-side (see filterByDomain) so an
+      // account is matched whatever attribute carries the domain — server-side
+      // $filter on `mail`/UPN alone misses accounts whose domain is only an
+      // alias/proxy address.
+      $select = 'id,displayName,mail,userPrincipalName,givenName,surname,'
+              . 'accountEnabled,otherMails,proxyAddresses';
       $url    = 'https://graph.microsoft.com/v1.0/users?$select=' . $select . '&$top=999';
-
-      $domains = PluginSsomicrosoftConnection::parseEmailFilters($conn['email_filter'] ?? '');
-      if (!empty($domains)) {
-         $clauses = [];
-         foreach ($domains as $domain) {
-            $safe = str_replace("'", "''", $domain);
-            // Match on both mail and userPrincipalName: many Entra accounts have
-            // no mailbox (mail = null) but a UPN on the filtered domain, and
-            // would otherwise be skipped entirely (never created in GLPI).
-            $clauses[] = "endsWith(mail,'{$safe}')";
-            $clauses[] = "endsWith(userPrincipalName,'{$safe}')";
-         }
-         // Advanced query (endsWith) requires ConsistencyLevel + $count.
-         $url .= '&$count=true&$filter=' . rawurlencode(implode(' or ', $clauses));
-      }
 
       $users = [];
       $guard = 0;
@@ -142,7 +193,6 @@ class PluginSsomicrosoftSync {
          $response = self::httpGet($url, [
             'Authorization: Bearer ' . $token,
             'Content-Type: application/json',
-            'ConsistencyLevel: eventual',
          ]);
          if ($response === null) {
             break;
