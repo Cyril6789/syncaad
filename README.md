@@ -21,6 +21,11 @@ Plugin GLPI **« Synchro AAD »** permettant de synchroniser les utilisateurs de
 2. Dans GLPI, aller dans **Configuration > Plugins**, puis **installer** et **activer** « Synchro AAD ».
 3. Le menu apparaît dans **Configuration > Synchro AAD** (droit `plugin_syncaad`).
 
+> Le droit `plugin_syncaad` est accordé automatiquement au profil **Super-Admin**
+> (et au profil de l'installateur) lors de l'installation. Il est ensuite visible
+> et modifiable pour chaque profil via **Administration > Profils > onglet
+> « Synchro AAD »**.
+
 ## Enregistrement de l'application dans Entra ID
 
 Dans le portail Entra ID (Azure) → **App registrations** → **New registration** :
