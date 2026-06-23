@@ -61,6 +61,12 @@ function plugin_init_syncaad() {
 
     Plugin::registerClass('PluginSyncaadConnection');
 
+    // Expose the plugin rights in the standard profile form so that a
+    // super-admin can see and manage them from Administration > Profiles.
+    Plugin::registerClass('PluginSyncaadProfile', [
+        'addtabon' => 'Profile',
+    ]);
+
     // Menu entry (standard interface), only for users allowed to manage connections.
     if (Session::haveRight('plugin_syncaad', READ)) {
         $PLUGIN_HOOKS['menu_toadd']['syncaad'] = [
@@ -175,16 +181,39 @@ function plugin_syncaad_install() {
 
     $migration->executeMigration();
 
-    // Make the right usable: register it and grant it to the super-admin profile.
+    // Make the right usable: register it for every profile so it shows up in
+    // the profile form, then grant full access to the super-admin profile and
+    // to the profile currently used by the installer.
     ProfileRight::addProfileRights(['plugin_syncaad']);
-    $full = READ | CREATE | UPDATE | DELETE | PURGE;
-    foreach ([4, (int) ($_SESSION['glpiactiveprofile']['id'] ?? 0)] as $profile_id) {
+
+    // Resolve the super-admin profile dynamically (it is id 4 on a default
+    // GLPI install, but may differ). Fall back to id 4 if not found.
+    $super_admin_id = 0;
+    foreach ($DB->request([
+        'SELECT' => 'id',
+        'FROM'   => 'glpi_profiles',
+        'WHERE'  => ['name' => 'Super-Admin'],
+    ]) as $row) {
+        $super_admin_id = (int) $row['id'];
+    }
+    if ($super_admin_id <= 0) {
+        $super_admin_id = 4;
+    }
+
+    foreach ([$super_admin_id, (int) ($_SESSION['glpiactiveprofile']['id'] ?? 0)] as $profile_id) {
         if ($profile_id > 0) {
+            // Grant the right and, for the active profile, refresh the running
+            // session so the configuration key works without re-logging in.
+            PluginSyncaadProfile::createFirstAccess($profile_id);
             $DB->update(
                 'glpi_profilerights',
-                ['rights' => $full],
+                ['rights' => READ | CREATE | UPDATE | DELETE | PURGE],
                 ['profiles_id' => $profile_id, 'name' => 'plugin_syncaad']
             );
+            if (isset($_SESSION['glpiactiveprofile']['id'])
+                && (int) $_SESSION['glpiactiveprofile']['id'] === $profile_id) {
+                $_SESSION['glpiactiveprofile']['plugin_syncaad'] = READ | CREATE | UPDATE | DELETE | PURGE;
+            }
         }
     }
 
