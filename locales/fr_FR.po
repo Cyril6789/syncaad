@@ -1,0 +1,109 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Synchro AAD 2.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "A PHP version providing random_bytes() is required by Synchro AAD."
+msgstr "Une version de PHP fournissant random_bytes() est requise par Synchro AAD."
+
+msgid "Authentification SSO"
+msgstr "Authentification SSO"
+
+msgid "Ce compte est désactivé dans GLPI."
+msgstr "Ce compte est désactivé dans GLPI."
+
+msgid "Ce compte ne correspond pas au domaine autorisé pour cette connexion."
+msgstr "Ce compte ne correspond pas au domaine autorisé pour cette connexion."
+
+msgid "Client ID"
+msgstr "Client ID"
+
+msgid "Client Secret"
+msgstr "Client Secret"
+
+msgid "Connexion Entra ID"
+msgid_plural "Connexions Entra ID"
+msgstr[0] "Connexion Entra ID"
+msgstr[1] "Connexions Entra ID"
+
+msgid "Connexion Entra ID"
+msgstr "Connexion Entra ID"
+
+msgid "Connexion SSO introuvable ou désactivée."
+msgstr "Connexion SSO introuvable ou désactivée."
+
+msgid "Créer les comptes manquants"
+msgstr "Créer les comptes manquants"
+
+msgid "Désactiver les comptes absents"
+msgstr "Désactiver les comptes absents"
+
+msgid "Entité par défaut (nouveaux comptes)"
+msgstr "Entité par défaut (nouveaux comptes)"
+
+msgid "Erreur renvoyée par Entra ID : %s"
+msgstr "Erreur renvoyée par Entra ID : %s"
+
+msgid "Ex. : @contoso.com — seuls les comptes dont l'email se termine ainsi sont traités."
+msgstr "Ex. : @contoso.com — seuls les comptes dont l'email se termine ainsi sont traités."
+
+msgid "Filtre de domaine"
+msgstr "Filtre de domaine"
+
+msgid "Impossible de récupérer le profil utilisateur depuis Microsoft Graph."
+msgstr "Impossible de récupérer le profil utilisateur depuis Microsoft Graph."
+
+msgid "La connexion à GLPI a échoué (aucune habilitation valide ?)."
+msgstr "La connexion à GLPI a échoué (aucune habilitation valide ?)."
+
+msgid "Laisser vide pour utiliser : %s — cette URL doit être déclarée comme \"Redirect URI\" (type Web) dans Entra ID."
+msgstr "Laisser vide pour utiliser : %s — cette URL doit être déclarée comme \"Redirect URI\" (type Web) dans Entra ID."
+
+msgid "Profil par défaut (nouveaux comptes)"
+msgstr "Profil par défaut (nouveaux comptes)"
+
+msgid "Requête SSO invalide (state)."
+msgstr "Requête SSO invalide (state)."
+
+msgid "Retour"
+msgstr "Retour"
+
+msgid "SSO activé"
+msgstr "SSO activé"
+
+msgid "Se connecter avec %s"
+msgstr "Se connecter avec %s"
+
+msgid "Supprimer les comptes absents"
+msgstr "Supprimer les comptes absents"
+
+msgid "Synchro AAD"
+msgstr "Synchro AAD"
+
+msgid "Synchronisation"
+msgstr "Synchronisation"
+
+msgid "Synchronisation complète terminée."
+msgstr "Synchronisation complète terminée."
+
+msgid "Synchronisation de l'utilisateur terminée."
+msgstr "Synchronisation de l'utilisateur terminée."
+
+msgid "Synchronisation de la connexion terminée."
+msgstr "Synchronisation de la connexion terminée."
+
+msgid "Synchroniser toutes les connexions"
+msgstr "Synchroniser toutes les connexions"
+
+msgid "Tenant ID"
+msgstr "Tenant ID"
+
+msgid "The PHP \"curl\" extension is required by Synchro AAD."
+msgstr "L'extension PHP \"curl\" est requise par Synchro AAD."
+
+msgid "URL de redirection (Azure)"
+msgstr "URL de redirection (Azure)"
