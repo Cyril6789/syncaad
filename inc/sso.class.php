@@ -216,6 +216,8 @@ class PluginSsomicrosoftSso {
     * user object, marking it as an external authentication.
     */
    private static function login(User $user): bool {
+      global $CFG_GLPI;
+
       $auth = new Auth();
       $auth->user          = $user;
       $auth->auth_succeded = true;
@@ -224,7 +226,30 @@ class PluginSsomicrosoftSso {
 
       Session::init($auth);
 
-      return (bool) Session::getLoginUserID();
+      if (!Session::getLoginUserID()) {
+         return false;
+      }
+
+      // Persist the login across browser restarts.
+      //
+      // Session::init() only sets the PHP session cookie, which the browser
+      // drops when it is closed (session.cookie_lifetime = 0). The standard
+      // GLPI login form keeps the user logged in via the "remember me"
+      // persistent cookie, but the SSO flow never goes through that form, so
+      // closing the browser logged the user straight back out. We reproduce
+      // GLPI's own mechanism here: issue a fresh cookie token and store it in
+      // the "<session>_rememberme" cookie that Auth::checkAlternateAuthSystems()
+      // reads to auto-login on the next visit. Guarded by login_remember_time:
+      // when the feature is disabled globally (0) GLPI ignores the cookie, so
+      // there is nothing to set.
+      if (!empty($CFG_GLPI['login_remember_time'])) {
+         $token = $user->getAuthToken('cookie_token', true);
+         if ($token) {
+            Auth::setRememberMeCookie(json_encode([$user->fields['id'], $token]));
+         }
+      }
+
+      return true;
    }
 
    /**
