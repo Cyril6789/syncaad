@@ -142,10 +142,21 @@ class PluginSsomicrosoftSso {
       // Reflect the user's Entra group memberships into GLPI groups and
       // habilitation rules, like the native LDAP login. Skipped (no Graph call)
       // when no GLPI group carries an LDAP linkage, so it stays a no-op until an
-      // administrator opts in by configuring group mappings.
+      // administrator opts in by configuring group mappings. When the group
+      // lookup fails (null), we deliberately do nothing rather than treat it as
+      // "no groups", so a transient error or a missing permission can never wipe
+      // the memberships/habilitations the user already has.
       if (PluginSsomicrosoftGroup::hasMappings()) {
-         PluginSsomicrosoftGroup::apply($user->getID(), self::fetchMyGroups($token['access_token']));
+         $groups = self::fetchMyGroups($token['access_token']);
+         if ($groups !== null) {
+            PluginSsomicrosoftGroup::apply($user->getID(), $groups);
+         }
       }
+
+      // Last-resort profile so a brand-new account can sign in, applied only if
+      // nothing else (a rule, a previous sync) gave the user any profile — see
+      // ensureProfile(). Run after the rules so it never overrides them.
+      PluginSsomicrosoftUser::ensureProfile($user->getID(), $conn);
 
       if (!self::login($user)) {
          self::fail(__('La connexion à GLPI a échoué (aucune habilitation valide ?).', 'ssomicrosoft'));
@@ -228,12 +239,16 @@ class PluginSsomicrosoftSso {
     *
     * Uses transitiveMemberOf so nested group memberships are resolved (like an
     * LDAP recursive group search), restricted to actual groups. Requires the
-    * delegated GroupMember.Read.All permission. Failures are non-fatal: an empty
-    * list simply means no group is mapped for this login.
+    * delegated GroupMember.Read.All permission.
     *
-    * @return array<int, array> Graph group objects.
+    * Returns null when the lookup fails (e.g. missing permission): callers must
+    * then leave the user's memberships untouched rather than assuming the user
+    * belongs to no group. An empty array means the call succeeded and the user
+    * is genuinely a member of no group.
+    *
+    * @return array<int, array>|null Graph group objects, or null on failure.
     */
-   private static function fetchMyGroups(string $access_token): array {
+   private static function fetchMyGroups(string $access_token): ?array {
       $select = 'id,displayName,onPremisesDistinguishedName,onPremisesSamAccountName';
       $url    = 'https://graph.microsoft.com/v1.0/me/transitiveMemberOf/microsoft.graph.group'
               . '?$select=' . $select . '&$top=999';
@@ -254,11 +269,23 @@ class PluginSsomicrosoftSso {
          curl_close($ch);
 
          if ($response === false || $status < 200 || $status >= 300) {
-            break;
+            // Most often a 403 because the delegated GroupMember.Read.All
+            // permission is missing or was not (re-)consented after the scope
+            // was added. Log it so the absence of group mapping is explainable.
+            Toolbox::logInFile(
+               'ssomicrosoft',
+               sprintf(
+                  "SSO : échec de lecture des groupes (/me/transitiveMemberOf) HTTP %d. "
+                  . "Vérifiez la permission Déléguée « GroupMember.Read.All » (+ consentement). %s\n",
+                  $status,
+                  is_string($response) ? substr($response, 0, 400) : ''
+               )
+            );
+            return null;
          }
          $data = json_decode((string) $response, true);
          if (!is_array($data)) {
-            break;
+            return null;
          }
          foreach (($data['value'] ?? []) as $group) {
             $groups[] = $group;

@@ -106,7 +106,10 @@ class PluginSsomicrosoftUser {
             return null;
          }
 
-         self::ensureProfile((int) $id, $conn);
+         // Note: the default profile is NOT assigned here. It is applied by the
+         // caller (SSO login / sync) only as a last resort, after the group and
+         // habilitation rules have run, so a rule-based profile always wins and
+         // the plugin never forces a default over the rules' decision.
          $user->getFromDB((int) $id);
 
          return $user;

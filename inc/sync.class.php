@@ -73,13 +73,22 @@ class PluginSsomicrosoftSync {
 
       foreach ($scoped as $user) {
          $glpi_user = PluginSsomicrosoftUser::upsert($user, $conn, true);
-
-         if ($glpi_user !== null && $apply_groups && $group_token && !empty($user['id'])) {
-            PluginSsomicrosoftGroup::apply(
-               $glpi_user->getID(),
-               self::fetchUserGroups($group_token, (string) $user['id'])
-            );
+         if ($glpi_user === null) {
+            continue;
          }
+
+         // Apply group memberships / habilitation rules. A null result means the
+         // group lookup failed (e.g. missing permission): skip rather than wipe
+         // the user's existing memberships and dynamic profiles.
+         if ($apply_groups && $group_token && !empty($user['id'])) {
+            $groups = self::fetchUserGroups($group_token, (string) $user['id']);
+            if ($groups !== null) {
+               PluginSsomicrosoftGroup::apply($glpi_user->getID(), $groups);
+            }
+         }
+
+         // Last-resort profile (only if the user still has none), after rules.
+         PluginSsomicrosoftUser::ensureProfile($glpi_user->getID(), $conn);
       }
 
       if (!empty($conn['delete_missing']) || !empty($conn['disable_if_disabled'])) {
@@ -298,12 +307,15 @@ class PluginSsomicrosoftSync {
     * Fetch a single Entra user's group memberships (application flow).
     *
     * Uses transitiveMemberOf so nested groups are resolved, restricted to
-    * groups. Requires the application permission GroupMember.Read.All. Returns
-    * an empty list on any error (non-fatal: the user simply gets no group).
+    * groups. Requires the application permission GroupMember.Read.All.
     *
-    * @return array<int, array> Graph group objects.
+    * Returns null on any error (the caller then leaves the user's memberships
+    * untouched instead of wiping them); an empty array means the call succeeded
+    * and the user belongs to no group.
+    *
+    * @return array<int, array>|null Graph group objects, or null on failure.
     */
-   private static function fetchUserGroups(string $token, string $entra_user_id): array {
+   private static function fetchUserGroups(string $token, string $entra_user_id): ?array {
       $select = 'id,displayName,onPremisesDistinguishedName,onPremisesSamAccountName';
       $url    = 'https://graph.microsoft.com/v1.0/users/' . rawurlencode($entra_user_id)
               . '/transitiveMemberOf/microsoft.graph.group?$select=' . $select . '&$top=999';
@@ -317,11 +329,11 @@ class PluginSsomicrosoftSync {
             'Content-Type: application/json',
          ]);
          if ($response === null) {
-            break;
+            return null;
          }
          $data = json_decode($response, true);
          if (!is_array($data)) {
-            break;
+            return null;
          }
          foreach (($data['value'] ?? []) as $group) {
             $groups[] = $group;
